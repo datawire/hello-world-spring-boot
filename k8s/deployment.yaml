@@ -1,14 +1,8 @@
 ---
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: {{ service.namespace }}
----
-apiVersion: v1
 kind: Service
 metadata:
   name: {{ build.name }}
-  namespace: {{ service.namespace }}
   {%- if "endpoint" in build.profile %}
   annotations:
     getambassador.io/config: |
@@ -16,7 +10,6 @@ metadata:
       apiVersion: ambassador/v0
       kind: Mapping
       name: {{build.name}}-mapping
-      host: {{build.profile.host}}
       prefix: {{build.profile.endpoint}}
       service: {{build.name}}.{{service.namespace}}.svc.cluster.local
       {%- if "weight" in build.profile %}
@@ -35,7 +28,6 @@ apiVersion: apps/v1beta1
 kind: Deployment
 metadata:
   name: {{ build.name }}
-  namespace: {{ service.namespace }}
 spec:
   replicas: 1
   strategy:
