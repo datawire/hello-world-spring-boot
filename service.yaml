@@ -1,0 +1,41 @@
+{% set sanitized_branch = (branch or "dev").replace('/', '-') %}
+{% set host_to_route = env.get('HOST_TO_ROUTE', 'dashboard.k736.net') %}
+{% set apihost_scheme = env.get('APIHOST_SCHEME', 'https') %}
+
+name: hellospring
+namespace: dashboard
+apihost_scheme: {{apihost_scheme}}
+
+containers:
+  - dockerfile: Dockerfile
+    context: .
+    rebuild:
+      root: /srv
+      command: ./gradlew test build
+      sources:
+        - build.gradle
+        - settings.gradle
+        - src
+
+profiles:
+  stable:
+    host: {{host_to_route}}
+    endpoint: /java-spring-api
+    max_memory: 0.25G
+    max_cpu: 0.25
+  canary:
+    host: {{host_to_route}}
+    endpoint: /java-spring-api
+    weight: 50 # percentage of traffic to route to this class of deployment
+    max_memory: 0.25G
+    max_cpu: 0.25G
+  default:
+    name: {{sanitized_branch}}
+    host: {{sanitized_branch}}-{{host_to_route}}
+    endpoint: /java-spring-api
+    max_memory: 0.1G
+    max_cpu: 0.1
+
+branches:
+  master: stable
+  dev/*: default
