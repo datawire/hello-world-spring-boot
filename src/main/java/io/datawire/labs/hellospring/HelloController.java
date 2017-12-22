@@ -13,11 +13,11 @@ public class HelloController {
 
     @GetMapping("/")
     public String sayHello() {
-        long elapsed = System.currentTimeMillis() - start;
-        String uptime = String.format("%d:%d:%d",
-                                      TimeUnit.MILLISECONDS.toHours(elapsed),
-                                      TimeUnit.MILLISECONDS.toMinutes(elapsed),
-                                      TimeUnit.MILLISECONDS.toSeconds(elapsed));
+        long millis = System.currentTimeMillis() - start;
+        String uptime = String.format("%02d:%02d",
+                                      TimeUnit.MILLISECONDS.toMinutes(millis),
+                                      TimeUnit.MILLISECONDS.toSeconds(millis) -
+                                      TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)));
         return String.format("Hello, Spring! (up %s, %s)", uptime, System.getenv("BUILD_PROFILE"));
     }
 
